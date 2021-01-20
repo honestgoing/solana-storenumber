@@ -1,17 +1,17 @@
 /**
- * Hello world
+ * Store number
  */
 
 import {
   establishConnection,
   establishPayer,
   loadProgram,
-  sayHello,
-  reportHellos,
-} from './hello_world';
+  storeNumber,
+  reportNum,
+} from './store_number';
 
 async function main() {
-  console.log("Let's say hello to a Solana account...");
+  console.log("Let's store number to a Solana account...");
 
   // Establish connection to the cluster
   await establishConnection();
@@ -22,11 +22,11 @@ async function main() {
   // Load the program if not already loaded
   await loadProgram();
 
-  // Say hello to an account
-  await sayHello();
+  // Store the number
+  await storeNumber(Number(process.argv[2]));
 
-  // Find out how many times that account has been greeted
-  await reportHellos();
+  // Load the number has been stored
+  await reportNum();
 
   console.log('Success');
 }

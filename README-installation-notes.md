@@ -24,11 +24,11 @@ $ npm install
 ```
 
 ### Git Repository
-Clone the 'example-helloworld' repository into your development machine:
+Clone the 'solana-storenumber' repository into your development machine:
 ```bash
 $ cd /path/to/your/work/folder/
-$ git clone https://github.com/solana-labs/example-helloworld.git
-$ cd example-helloworld
+$ git clone https://github.com/honestgoing/solana-storenumber.git
+$ cd solana-storenumber
 ```
 (If you plan to submit changes in a pull request, be sure to create a fork first
 and then clone your fork.)

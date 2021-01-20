@@ -4,14 +4,7 @@
   </a>
 </p>
 
-[![Build status][travis-image]][travis-url] [![Gitpod
-Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/solana-labs/example-helloworld)
-
-[travis-image]:
-https://travis-ci.org/solana-labs/example-helloworld.svg?branch=master
-[travis-url]: https://travis-ci.org/solana-labs/example-helloworld
-
-# Hello world on Solana
+# Store Number on Solana
 
 This project demonstrates how to use the [Solana Javascript
 API](https://github.com/solana-labs/solana-web3.js) to build, deploy, and
@@ -19,12 +12,11 @@ interact with programs on the Solana blockchain.
 
 The project comprises of:
 
-* An on-chain hello world program
-* A client that can send a "hello" to an account and get back the number of
-  times "hello" has been sent
+* An on-chain store number program
+* A client that can store a number to an account and get back the number has been stored
 
 ## Table of Contents
-- [Hello world on Solana](#hello-world-on-solana)
+- [Store Number on Solana](#store-number-on-solana)
   - [Table of Contents](#table-of-contents)
   - [Quick Start](#quick-start)
     - [Start local Solana cluster](#start-local-solana-cluster)
@@ -37,28 +29,18 @@ The project comprises of:
   - [Learn about the client](#learn-about-the-client)
     - [Entrypoint](#entrypoint)
     - [Establish a connection to the cluster](#establish-a-connection-to-the-cluster)
-    - [Load the helloworld on-chain program if not already loaded](#load-the-helloworld-on-chain-program-if-not-already-loaded)
-    - [Send a "Hello" transaction to the on-chain program](#send-a-hello-transaction-to-the-on-chain-program)
-    - [Query the Solana account used in the "Hello" transaction](#query-the-solana-account-used-in-the-hello-transaction)
+    - [Load the storenumber on-chain program if not already loaded](#load-the-storenumber-on-chain-program-if-not-already-loaded)
+    - [Send a "Store number" transaction to the on-chain program](#send-a-store-number-transaction-to-the-on-chain-program)
+    - [Query the Solana account used in the "Store number" transaction](#query-the-solana-account-used-in-the-store-number-transaction)
   - [Learn about the on-chain program](#learn-about-the-on-chain-program)
     - [Programming on Solana](#programming-on-solana)
-  - [Pointing to a public Solana cluster](#pointing-to-a-public-solana-cluster)
-  - [Expand your skills with advanced examples](#expand-your-skills-with-advanced-examples)
-      cluster](#establish-a-connection-to-the-cluster)
-    - [Load the helloworld on-chain program if not already loaded](#load-the-helloworld-on-chain-program-if-not-already-loaded)
-    - [Send a "Hello" transaction to the on-chain program](#send-a-hello-transaction-to-the-on-chain-program)
-    - [Query the Solana account used in the "Hello" transaction](#query-the-solana-account-used-in-the-hello-transaction)
-  - [Learn about the on-chain program](#learn-about-the-on-chain-program)
-    - [Entrypoint](#entrypoint-1)
-    - [Processing an instruction](#processing-an-instruction)
-    - [Rust limitations](#rust-limitations)
   - [Pointing to a public Solana cluster](#pointing-to-a-public-solana-cluster)
   - [Expand your skills with advanced examples](#expand-your-skills-with-advanced-examples)
 
 ## Quick Start
 
 [![Open in
-Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/solana-labs/example-helloworld)
+Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/honestgoing/solana-storenumber)
 
 If you decide to open in Gitpod then refer to
 [README-gitpod.md](README-gitpod.md), otherwise continue reading.
@@ -91,35 +73,29 @@ $ solana-test-validator --log
 
 ### Build the on-chain program
 
-There is both a Rust and C version of the on-chain program, whichever is built
-last will be the one used when running the example.
-
 ```bash
 $ npm run build:program-rust
-```
-
-```bash
-$ npm run build:program-c
 ```
 
 ### Run the client
 
 ```bash
-$ npm run start
+$ npm run start 42
 ```
 
 ### Expected output
 
 Public key values will differ:
 
-```bash
-Lets say hello to a Solana account...
-Connection to cluster established: http://localhost:8899 { solana-core: 1.1.2 }
-Loading hello world program...
-Program loaded to account 47bZX1D1tdmw3KWTo5MfBrAwwHBJQQzQL4VnNGT7HtyQ
-Creating account Eys1jdLHdZ2AE56QAKpfadbjziMZ6NAvpL7qsdtM6sbk to say hello to
-Saying hello to Eys1jdLHdZ2AE56QAKpfadbjziMZ6NAvpL7qsdtM6sbk
-Eys1jdLHdZ2AE56QAKpfadbjziMZ6NAvpL7qsdtM6sbk has been greeted 1 times
+```
+Let's store number to a Solana account...
+Connection to cluster established: http://localhost:8899 { 'solana-core': '1.5.3', 'feature-set': 1441058695 }
+Using account 8n2ch9ScAXoQNmZV4qun5mSsqQfK1GfSieqBRdXPhpGC containing 0.1484356 Sol to pay for fees
+Loading store number program...
+Program loaded to account H8VcqggncztbKTZWkfJ6eCE7a3jjC5EHXQJpJpxi6Azk
+Creating account 4T7Ub5EMzYcZHCrerLGBRYjSBTSWumJi7Tx7LxRKuzvM to store number to
+Store number 42 to 4T7Ub5EMzYcZHCrerLGBRYjSBTSWumJi7Tx7LxRKuzvM
+4T7Ub5EMzYcZHCrerLGBRYjSBTSWumJi7Tx7LxRKuzvM has stored number: 42
 Success
 ```
 
@@ -140,10 +116,10 @@ Success
 ### Customizing the Program
 
 To customize the example, make changes to the files under `/src`.  If you change
-any files under `/src/program-rust` or `/src/program-c` you will need to
+any files under `/src/program-rust` you will need to
 [rebuild the on-chain program](#build-the-on-chain-program)
 
-Now when you rerun `npm run start`, you should see the results of your changes.
+Now when you rerun `npm run start 42`, you should see the results of your changes.
 
 ## Learn about Solana
 
@@ -162,58 +138,56 @@ The client in this example is written in JavaScript using:
 ### Entrypoint
 
 The [client's
-entrypoint](https://github.com/solana-labs/example-helloworld/blob/e936ab42e168f1939df0164d5996adf9ca635bd0/src/client/main.js#L14)
+entrypoint](./src/client/main.ts#L14)
 does four things
 
 ### Establish a connection to the cluster
 
 The client establishes a connection with the cluster by calling
-[`establishConnection`](https://github.com/solana-labs/example-helloworld/blob/e936ab42e168f1939df0164d5996adf9ca635bd0/src/client/hello_world.js#L45).
+[`establishConnection`](./src/client/store_number.ts#L59).
 
-### Load the helloworld on-chain program if not already loaded
+### Load the storenumber on-chain program if not already loaded
 
 The process of loading a program on the cluster includes storing the shared
 object's bytes in a Solana account's data vector and marking the account
 executable.
 
 The client loads the program by calling
-[`loadProgram`](https://github.com/solana-labs/example-helloworld/blob/e936ab42e168f1939df0164d5996adf9ca635bd0/src/client/hello_world.js#L54).
+[`loadProgram`](./src/client/store_number.ts#L106).
 The first time `loadProgram` is called, the client:
 
 - Reads the shared object from the file system
 - Calculates the fees associated with loading the program
 - Airdrops lamports to a payer account to pay for the load
 - Loads the program via the Solana web3.js function
-  ['BPFLoader.load']([TODO](https://github.com/solana-labs/solana-web3.js/blob/37d57926b9dba05d1ad505d4fd39d061030e2e87/src/bpf-loader.js#L36))
-- Creates a new "greeter" account that will be used in the "Hello" transaction
+  ['BPFLoader.load'](https://github.com/solana-labs/solana-web3.js/blob/b86dcdbd1603cfa360cb79888590abebdcb393b2/src/bpf-loader.js#L36)
+- Creates a new "store" account that will be used in the "Store number" transaction
 - Records the [public
-  key](https://github.com/solana-labs/solana-web3.js/blob/37d57926b9dba05d1ad505d4fd39d061030e2e87/src/publickey.js#L10)
-  of both the loaded helloworld program and the "greeter" account in a config
+  key](https://github.com/solana-labs/solana-web3.js/blob/b86dcdbd1603cfa360cb79888590abebdcb393b2/src/publickey.js#L21)
+  of both the loaded storenumber program and the "store" account in a config
   file.  Repeated calls to the client will refer to the same loaded program and
-  "greeter" account.  (To force the reload of the program issue `npm
+  "store" account.  (To force the reload of the program issue `npm
   clean:store`)
 
-### Send a "Hello" transaction to the on-chain program
+### Send a "Store number" transaction to the on-chain program
 
-The client then constructs and sends a "Hello" transaction to the program by
+The client then constructs and sends a "Store number" transaction to the program by
 calling
-[`sayHello`](https://github.com/solana-labs/example-helloworld/blob/e936ab42e168f1939df0164d5996adf9ca635bd0/src/client/hello_world.js#L121).
+[`storeNumber`](./src/client/store_number.ts#L172).
 The transaction contains a single very simple instruction that primarily carries
-the public key of the helloworld program account to call and the "greeter"
-account to which the client wishes to say "Hello" to.
+the public key of the storenumber program account to call and the "store"
+account to which the client wishes to store number to and the number to store.
 
-### Query the Solana account used in the "Hello" transaction
+### Query the Solana account used in the "Store number" transaction
 
-Each time the client says "Hello" to an account, the program increments a
-numerical count in the "greeter" account's data.  The client queries the
-"greeter" account's data to discover the current number of times the account has
-been greeted by calling
-[`reportHellos`](https://github.com/solana-labs/example-helloworld/blob/e936ab42e168f1939df0164d5996adf9ca635bd0/src/client/hello_world.js#L138.)
+The client queries the
+"store" account's data to discover the current number stored in the account by calling
+[`reportNum`](./src/client/store_number.ts#L197)
 
 ## Learn about the on-chain program
 
-The [on-chain helloworld program](src/program/Cargo.toml) is a Rust program
-compiled to [Berkley Packet Format
+The [on-chain storenumber program](src/program/Cargo.toml) is a Rust program
+compiled to [Berkley Packet Filter
 (BPF)](https://en.wikipedia.org/wiki/Berkeley_Packet_Filter) and stored as an
 [Executable and Linkable Format (ELF) shared
 object](https://en.wikipedia.org/wiki/Executable_and_Linkable_Format).
@@ -261,4 +235,3 @@ serialization, benchmarking, etc...
   Program](https://github.com/solana-labs/solana-program-library/tree/master/token)
 - [Token Swap
   Program](https://github.com/solana-labs/solana-program-library/tree/master/token-swap)
-- 

@@ -8,43 +8,43 @@ use solana_program::{
     pubkey::Pubkey,
 };
 use std::mem;
+use std::convert::TryInto;
 
 // Declare and export the program's entrypoint
 entrypoint!(process_instruction);
 
 // Program entrypoint's implementation
 fn process_instruction(
-    program_id: &Pubkey, // Public key of the account the hello world program was loaded into
-    accounts: &[AccountInfo], // The account to say hello to
-    _instruction_data: &[u8], // Ignored, all helloworld instructions are hellos
+    program_id: &Pubkey, // Public key of the account the store number program was loaded into
+    accounts: &[AccountInfo], // account to store the number
+    instruction_data: &[u8],
 ) -> ProgramResult {
-    info!("Helloworld Rust program entrypoint");
+    info!("Number upload Rust program entrypoint");
 
-    // Iterating accounts is safer then indexing
+    // Iterating accounts is safer than indexing
     let accounts_iter = &mut accounts.iter();
 
-    // Get the account to say hello to
+    // Get the account to store number to
     let account = next_account_info(accounts_iter)?;
 
     // The account must be owned by the program in order to modify its data
     if account.owner != program_id {
-        info!("Greeted account does not have the correct program id");
+        info!("Store account does not have the correct program id");
         return Err(ProgramError::IncorrectProgramId);
     }
 
     // The data must be large enough to hold a u64 count
     if account.try_data_len()? < mem::size_of::<u32>() {
-        info!("Greeted account data length too small for u32");
+        info!("Store account data length too small for u32");
         return Err(ProgramError::InvalidAccountData);
     }
 
-    // Increment and store the number of times the account has been greeted
+    // Store the number to the account
     let mut data = account.try_borrow_mut_data()?;
-    let mut num_greets = LittleEndian::read_u32(&data);
-    num_greets += 1;
-    LittleEndian::write_u32(&mut data[0..], num_greets);
+    let num = instruction_data.try_into().ok().map(u32::from_le_bytes).ok_or(ProgramError::InvalidInstructionData)?;
+    LittleEndian::write_u32(&mut data[0..], num);
 
-    info!("Hello!");
+    info!("Number saved!");
 
     Ok(())
 }
@@ -73,14 +73,18 @@ mod test {
             false,
             Epoch::default(),
         );
-        let instruction_data: Vec<u8> = Vec::new();
-
+        let mut instruction_data = vec![0; mem::size_of::<u32>()];
+        
         let accounts = vec![account];
-
-        assert_eq!(LittleEndian::read_u64(&accounts[0].data.borrow()), 0);
+        
+        assert_eq!(LittleEndian::read_u32(&accounts[0].data.borrow()), 0);
+        let forty_two= 42_u32;
+        LittleEndian::write_u32(&mut instruction_data[0..], forty_two);
         process_instruction(&program_id, &accounts, &instruction_data).unwrap();
-        assert_eq!(LittleEndian::read_u64(&accounts[0].data.borrow()), 1);
+        assert_eq!(LittleEndian::read_u32(&accounts[0].data.borrow()), forty_two);
+        let triple_six= 666_u32;
+        LittleEndian::write_u32(&mut instruction_data[0..], triple_six);
         process_instruction(&program_id, &accounts, &instruction_data).unwrap();
-        assert_eq!(LittleEndian::read_u64(&accounts[0].data.borrow()), 2);
+        assert_eq!(LittleEndian::read_u32(&accounts[0].data.borrow()), triple_six);
     }
 }

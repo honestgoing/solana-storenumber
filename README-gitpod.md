@@ -1,12 +1,7 @@
 [![Build status][travis-image]][travis-url] [![Gitpod
-Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/solana-labs/example-helloworld)
+Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/honestgoing/solana-storenumber)
 
-
-[travis-image]:
-https://travis-ci.org/solana-labs/example-helloworld.svg?branch=master
-[travis-url]: https://travis-ci.org/solana-labs/example-helloworld
-
-# Hello world on Solana (Gitpod version)
+# Store Number on Solana (Gitpod version)
 
 This project demonstrates how to use the [Solana Javascript
 API](https://github.com/solana-labs/solana-web3.js) to build, deploy, and
@@ -14,13 +9,12 @@ interact with programs on the Solana blockchain.
 
 The project comprises of:
 
-* An on-chain hello world program
-* A client that can send a "hello" to an account and get back the number of
-  times "hello" has been sent
+* An on-chain store number program
+* A client that can store a number to an account and get back the number has been stored
 
 ## Table of Contents
-- [Hello world on Solana (Gitpod
-  version)](#hello-world-on-solana-gitpod-version)
+- [Store Number on Solana (Gitpod
+  version)](#store-number-on-solana-gitpod-version)
   - [Table of Contents](#table-of-contents)
   - [Quick Start](#quick-start)
     - [Expected output](#expected-output)

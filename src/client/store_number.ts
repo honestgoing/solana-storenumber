@@ -35,22 +35,22 @@ let connection: Connection;
 let payerAccount: Account;
 
 /**
- * Hello world's program id
+ * Store number's program id
  */
 let programId: PublicKey;
 
 /**
- * The public key of the account we are saying hello to
+ * The public key of the account we are storing to
  */
-let greetedPubkey: PublicKey;
+let storePubkey: PublicKey;
 
-const pathToProgram = 'dist/program/helloworld.so';
+const pathToProgram = 'dist/program/storenumber.so';
 
 /**
  * Layout of the greeted account data
  */
-const greetedAccountDataLayout = BufferLayout.struct([
-  BufferLayout.u32('numGreets'),
+const storeAccountDataLayout = BufferLayout.struct([
+  BufferLayout.u32('num'),
 ]);
 
 /**
@@ -80,7 +80,7 @@ export async function establishPayer(): Promise<void> {
 
     // Calculate the cost to fund the greeter account
     fees += await connection.getMinimumBalanceForRentExemption(
-      greetedAccountDataLayout.span,
+      storeAccountDataLayout.span,
     );
 
     // Calculate the cost of sending the transactions
@@ -101,7 +101,7 @@ export async function establishPayer(): Promise<void> {
 }
 
 /**
- * Load the hello world BPF program if not already loaded
+ * Load the store number BPF program if not already loaded
  */
 export async function loadProgram(): Promise<void> {
   const store = new Store();
@@ -110,7 +110,7 @@ export async function loadProgram(): Promise<void> {
   try {
     const config = await store.load('config.json');
     programId = new PublicKey(config.programId);
-    greetedPubkey = new PublicKey(config.greetedPubkey);
+    storePubkey = new PublicKey(config.storePubkey);
     await connection.getAccountInfo(programId);
     console.log('Program already loaded to account', programId.toBase58());
     return;
@@ -119,7 +119,7 @@ export async function loadProgram(): Promise<void> {
   }
 
   // Load the program
-  console.log('Loading hello world program...');
+  console.log('Loading store number program...');
   const data = await fs.readFile(pathToProgram);
   const programAccount = new Account();
   await BpfLoader.load(
@@ -132,18 +132,18 @@ export async function loadProgram(): Promise<void> {
   programId = programAccount.publicKey;
   console.log('Program loaded to account', programId.toBase58());
 
-  // Create the greeted account
-  const greetedAccount = new Account();
-  greetedPubkey = greetedAccount.publicKey;
-  console.log('Creating account', greetedPubkey.toBase58(), 'to say hello to');
-  const space = greetedAccountDataLayout.span;
+  // Create the store account
+  const storeAccount = new Account();
+  storePubkey = storeAccount.publicKey;
+  console.log('Creating account', storePubkey.toBase58(), 'to store number to');
+  const space = storeAccountDataLayout.span;
   const lamports = await connection.getMinimumBalanceForRentExemption(
-    greetedAccountDataLayout.span,
+    storeAccountDataLayout.span,
   );
   const transaction = new Transaction().add(
     SystemProgram.createAccount({
       fromPubkey: payerAccount.publicKey,
-      newAccountPubkey: greetedPubkey,
+      newAccountPubkey: storePubkey,
       lamports,
       space,
       programId,
@@ -152,7 +152,7 @@ export async function loadProgram(): Promise<void> {
   await sendAndConfirmTransaction(
     connection,
     transaction,
-    [payerAccount, greetedAccount],
+    [payerAccount, storeAccount],
     {
       commitment: 'singleGossip',
       preflightCommitment: 'singleGossip',
@@ -161,21 +161,24 @@ export async function loadProgram(): Promise<void> {
 
   // Save this info for next time
   await store.save('config.json', {
-    url: urlTls,
     programId: programId.toBase58(),
-    greetedPubkey: greetedPubkey.toBase58(),
+    storePubkey: storePubkey.toBase58(),
   });
 }
 
 /**
- * Say hello
+ * Store number
  */
-export async function sayHello(): Promise<void> {
-  console.log('Saying hello to', greetedPubkey.toBase58());
+export async function storeNumber(num: number): Promise<void> {
+  console.log(`Store number ${num} to`, storePubkey.toBase58());
+  let data = Buffer.alloc(4);
+  storeAccountDataLayout.encode({
+    num,
+  }, data)
   const instruction = new TransactionInstruction({
-    keys: [{pubkey: greetedPubkey, isSigner: false, isWritable: true}],
+    keys: [{pubkey: storePubkey, isSigner: false, isWritable: true}],
     programId,
-    data: Buffer.alloc(0), // All instructions are hellos
+    data,
   });
   await sendAndConfirmTransaction(
     connection,
@@ -189,18 +192,17 @@ export async function sayHello(): Promise<void> {
 }
 
 /**
- * Report the number of times the greeted account has been said hello to
+ * Report the number of the account has been stored
  */
-export async function reportHellos(): Promise<void> {
-  const accountInfo = await connection.getAccountInfo(greetedPubkey);
+export async function reportNum(): Promise<void> {
+  const accountInfo = await connection.getAccountInfo(storePubkey);
   if (accountInfo === null) {
-    throw 'Error: cannot find the greeted account';
+    throw 'Error: cannot find the store account';
   }
-  const info = greetedAccountDataLayout.decode(Buffer.from(accountInfo.data));
+  const info = storeAccountDataLayout.decode(Buffer.from(accountInfo.data));
   console.log(
-    greetedPubkey.toBase58(),
-    'has been greeted',
-    info.numGreets.toString(),
-    'times',
+    storePubkey.toBase58(),
+    'has stored number:',
+    info.num.toString(),
   );
 }
